@@ -22,10 +22,10 @@ def get_rfm_stats():
     global df_rfm
     df_rfm_j_cid = df_rfm["customer_id"]
     df_orders_j = df_orders[df_orders["customer_id"].isin(df_rfm_j_cid)]
-    df_order_j_avgorders = df_orders_j.groupby(["order_id", "customer_id"])[["product_id"]].count().reset_index().groupby(["customer_id"]).mean().reset_index().rename(columns={"product_id": "Products in ord."})
+    df_order_j_avgorders = df_orders_j.groupby(by=["order_id", "customer_id"])[["product_id"]].count().reset_index().groupby(by=["customer_id"]).mean().reset_index().rename(columns={"product_id": "Products in ord."})
 
     df_rfm_stats = pd.concat([
-        df_rfm.groupby(["CLASS"]).median()[["Recency", "Frequency", "Monetary"]].rename(columns={
+        df_rfm.groupby(by=["CLASS"]).median()[["Recency", "Frequency", "Monetary"]].rename(columns={
             "Recency": "Recency (med.)", 
             "Frequency": "Frequency (med.)", 
             "Monetary": "Monetary (med.)"
@@ -35,13 +35,13 @@ def get_rfm_stats():
             df_rfm[["customer_id", "CLASS"]], 
             on="customer_id", 
             how='left'
-        )[["Products in ord.", "CLASS"]].groupby(["CLASS"]).mean().transpose()
+        )[["Products in ord.", "CLASS"]].groupby(by=["CLASS"]).mean().transpose()
     ]).round(2)
     return df_rfm_stats
 
 def get_rfm_monetary():
     global df_rfm
-    df_grouped = df_rfm.groupby(["CLASS"]).median()[["Recency", "Frequency", "Monetary"]].sort_values(["Monetary"])
+    df_grouped = df_rfm.groupby(by=["CLASS"]).median()[["Recency", "Frequency", "Monetary"]].sort_values(["Monetary"])
     return df_grouped.rename(columns = {'Monetary':'Monetary (med.)'}).reset_index()[["CLASS", "Monetary (med.)"]]
     #df_grouped[["AVG Monetary"]].plot.bar(ax=ax2, color="green")
 
@@ -53,7 +53,7 @@ def get_rfm_table():
 
 def get_rfm_totals():
     global df_rfm
-    df_rfm_totals = df_rfm[["CLASS", "customer_id"]].groupby(["CLASS"]).count().reset_index().rename(columns={
+    df_rfm_totals = df_rfm[["CLASS", "customer_id"]].groupby(by=["CLASS"]).count().reset_index().rename(columns={
         'CLASS': 'Segment',
         'customer_id': '# COUNT'
     })
